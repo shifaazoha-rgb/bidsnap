@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import type { EstimateInput } from "../types/estimate";
+import type { EstimateInput, QuoteData } from "../types/estimate";
+
+const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 const PROJECT_TYPES = [
   "Painting",
@@ -35,10 +37,25 @@ export default function EstimateForm() {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    // Simulate API call – replace with real POST /api/estimates/generate later
-    await new Promise((r) => setTimeout(r, 2000));
-    setIsSubmitting(false);
-    navigate("/quote/mock-1", { state: { estimateInput: data } });
+    try {
+      const res = await fetch(`${API_BASE}/api/estimates/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? "Failed to generate estimate");
+      }
+      const quote: QuoteData = await res.json();
+      navigate(`/quote/${quote.id}`, { state: { quote } });
+    } catch (e) {
+      console.error(e);
+      // Fallback: navigate with form data so quote page can show mock
+      navigate("/quote/mock-1", { state: { estimateInput: data } });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
