@@ -1,0 +1,33 @@
+PUSH BIDSNAP TO GITHUB - Run these in Command Prompt (CMD)
+=========================================================
+
+1. Open Command Prompt:
+   - Press Win+R, type: cmd
+   - Press Enter
+
+2. Go to your project folder:
+   cd C:\Users\PC\Documents\bidssnap
+
+3. If this is the first time (no .git folder), run:
+   git init
+   git remote add origin https://github.com/shifaazoha-rgb/bidsnap.git
+
+4. Stage and commit:
+   git add .
+   git commit -m "BidSnap frontend"
+
+5. Push (you will be asked for GitHub username and password/token):
+   git branch -M main
+   git push -u origin main
+
+6. When asked for "password", use a Personal Access Token from GitHub:
+   - GitHub.com -> Your profile -> Settings -> Developer settings
+   - Personal access tokens -> Generate new token (classic)
+   - Check "repo" -> Generate -> Copy the token
+   - Paste the token when git asks for password
+
+---
+If you get "filename or volume label syntax is incorrect":
+- Make sure you typed:  cd C:\Users\PC\Documents\bidssnap
+- Use backslash \ not forward slash /
+- No extra spaces before or after the path
