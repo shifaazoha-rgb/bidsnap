@@ -3,11 +3,11 @@ import type { EstimateInput, QuoteData, LineItem } from "../types/estimate.js";
 
 const anthropic = new Anthropic();
 
-const SYSTEM_PROMPT = `You are an expert construction estimator. Generate accurate, realistic quotes in JSON only.
+const SYSTEM_PROMPT = `You are an expert construction estimator for the Indian market. Generate accurate, realistic quotes in JSON only. All prices MUST be in Indian Rupees (INR).
 
 Output a single valid JSON object (no markdown, no code fence) with this exact shape:
 {
-  "totalCostRange": { "min": number, "max": number, "currency": "USD" },
+  "totalCostRange": { "min": number, "max": number, "currency": "INR" },
   "timeline": { "min": number, "max": number, "unit": "days" },
   "confidence": "low" | "medium" | "high",
   "breakdown": { "materials": number, "labor": number, "other": number },
@@ -17,7 +17,13 @@ Output a single valid JSON object (no markdown, no code fence) with this exact s
   "assumptions": string[]
 }
 
-Use realistic prices for the project type, area, quality, and location. Quantities and unit costs should be plausible.`;
+Use realistic Indian market prices for the project type, area, quality, and location. Reference typical rates:
+- Painting: ₹15-40/sq ft depending on quality
+- Kitchen Remodel: ₹1,500-4,000/sq ft
+- Bathroom Renovation: ₹1,200-3,500/sq ft
+- Flooring: ₹80-350/sq ft
+- Labor: ₹500-1,500/day per worker
+All amounts should be in INR (Indian Rupees).`;
 
 export async function generateQuote(input: EstimateInput, quoteId: string): Promise<QuoteData> {
   const userPrompt = `Create a detailed estimate for:

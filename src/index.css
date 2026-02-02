@@ -1,15 +1,31 @@
 @import "tailwindcss";
 
-/* BidSnap design tokens */
+/* BidSnap design tokens - Baby Pink + Pista Green palette */
 @theme {
-  /* Colors – spec */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-secondary: #10b981;
-  --color-accent: #f59e0b;
-  --color-neutral: #64748b;
-  --color-background: #f8fafc;
-  --color-error: #ef4444;
+  /* Primary (Baby Pink) */
+  --color-primary: #f8bbd0;
+  --color-primary-hover: #f48fb1;
+  --color-primary-text: #4a1d2f;
+
+  /* Accent (Pista Green) */
+  --color-accent: #cdeac0;
+  --color-accent-hover: #a7d7a0;
+  --color-accent-text: #1f3b2c;
+
+  /* Backgrounds / Surfaces */
+  --color-background: #fff6fa;
+  --color-background-alt: #f3faf5;
+  --color-card: #ffffff;
+  --color-border: #ead7e1;
+
+  /* Text */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+
+  /* Status */
+  --color-success: #7bc47f;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
 
   /* Spacing – spec */
   --space-xs: 4px;
@@ -40,15 +56,85 @@ html {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--color-background);
-  color: #0f172a;
+  color: var(--color-text-primary);
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* Smooth transitions globally */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Better focus states */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-hover);
+  outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

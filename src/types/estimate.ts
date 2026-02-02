@@ -25,6 +25,7 @@ export interface LineItem {
 export interface QuoteTotals {
   materials: number;
   labor: number;
+  equipment: number;
   other: number;
   subtotal: number;
   tax?: number;

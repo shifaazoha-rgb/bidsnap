@@ -47,7 +47,7 @@ router.post("/generate", async (req: Request, res: Response) => {
     } else {
       quote = mockQuoteFromInput(input, quoteId);
     }
-    setEstimate(quote);
+    await setEstimate(quote);
     res.status(201).json(quote);
   } catch (err) {
     console.error("POST /api/estimates/generate", err);
@@ -56,57 +56,72 @@ router.post("/generate", async (req: Request, res: Response) => {
 });
 
 /** GET /api/estimates/:id – retrieve saved estimate */
-router.get("/:id", (req: Request, res: Response) => {
-  const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
-  const quote = id ? getEstimate(id) : undefined;
-  if (!quote) {
-    res.status(404).json({ error: "Estimate not found" });
-    return;
+router.get("/:id", async (req: Request, res: Response) => {
+  try {
+    const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
+    const quote = id ? await getEstimate(id) : undefined;
+    if (!quote) {
+      res.status(404).json({ error: "Estimate not found" });
+      return;
+    }
+    res.json(quote);
+  } catch (err) {
+    console.error("GET /api/estimates/:id", err);
+    res.status(500).json({ error: "Failed to get estimate" });
   }
-  res.json(quote);
 });
 
 /** PUT /api/estimates/:id – update estimate after edits */
-router.put("/:id", (req: Request, res: Response) => {
-  const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
-  const existing = id ? getEstimate(id) : undefined;
-  if (!existing) {
-    res.status(404).json({ error: "Estimate not found" });
-    return;
+router.put("/:id", async (req: Request, res: Response) => {
+  try {
+    const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
+    const existing = id ? await getEstimate(id) : undefined;
+    if (!existing) {
+      res.status(404).json({ error: "Estimate not found" });
+      return;
+    }
+    const body = req.body as Partial<QuoteData>;
+    const updated: QuoteData = {
+      ...existing,
+      ...body,
+      id: existing.id,
+      updatedAt: new Date().toISOString(),
+    };
+    await setEstimate(updated);
+    res.json(updated);
+  } catch (err) {
+    console.error("PUT /api/estimates/:id", err);
+    res.status(500).json({ error: "Failed to update estimate" });
   }
-  const body = req.body as Partial<QuoteData>;
-  const updated: QuoteData = {
-    ...existing,
-    ...body,
-    id: existing.id,
-    updatedAt: new Date().toISOString(),
-  };
-  setEstimate(updated);
-  res.json(updated);
 });
 
 /** POST /api/estimates/:id/duplicate – clone estimate */
-router.post("/:id/duplicate", (req: Request, res: Response) => {
-  const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
-  const existing = id ? getEstimate(id) : undefined;
-  if (!existing) {
-    res.status(404).json({ error: "Estimate not found" });
-    return;
+router.post("/:id/duplicate", async (req: Request, res: Response) => {
+  try {
+    const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
+    const existing = id ? await getEstimate(id) : undefined;
+    if (!existing) {
+      res.status(404).json({ error: "Estimate not found" });
+      return;
+    }
+    const newId = generateId();
+    const now = new Date().toISOString();
+    const cloned: QuoteData = {
+      ...existing,
+      id: newId,
+      lineItems: existing.lineItems.map((item) => ({
+        ...item,
+        id: `${newId}_${item.id.split("_").pop() ?? item.id}`,
+      })),
+      createdAt: now,
+      updatedAt: now,
+    };
+    await setEstimate(cloned);
+    res.status(201).json(cloned);
+  } catch (err) {
+    console.error("POST /api/estimates/:id/duplicate", err);
+    res.status(500).json({ error: "Failed to duplicate estimate" });
   }
-  const newId = generateId();
-  const now = new Date().toISOString();
-  const cloned: QuoteData = {
-    ...existing,
-    id: newId,
-    lineItems: existing.lineItems.map((item) => ({
-      ...item,
-      id: `${newId}_${item.id.split("_").pop() ?? item.id}`,
-    })),
-    createdAt: now,
-    updatedAt: now,
-  };
-  setEstimate(cloned);
-  res.status(201).json(cloned);
 });
 
 export default router;
