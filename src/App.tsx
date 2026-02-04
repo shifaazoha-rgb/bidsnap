@@ -8,7 +8,7 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/estimate" element={<EstimateForm />} />
-      <Route path="/quote/:id" element={<QuoteDashboard />} />
+      <Route path="/quotedashboard" element={<QuoteDashboard />} />
     </Routes>
   );
 }

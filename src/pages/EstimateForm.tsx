@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import type { EstimateInput } from "../types/estimate";
 // Runtime imports
-import { apiGenerateEstimate, apiGenerateProposal } from "../lib/bidsnapApi";
+import { apiGenerateEstimate } from "../lib/bidsnapApi";
 // Type-only import
 import type { BidSnapInputs } from "../lib/bidsnapApi";
 
@@ -74,10 +74,10 @@ export default function EstimateForm() {
         additionalSpec: data.notes || "",
       };
 
-      const estimate = await apiGenerateEstimate(inputs);
-      const proposal = await apiGenerateProposal(inputs, estimate);
+      const quote = await apiGenerateEstimate(inputs);
+      // Local backend generates everything in one go currently.
 
-      navigate("/quotedashboard", { state: { estimate, inputs } });
+      navigate("/quotedashboard", { state: { quote, estimateInput: inputs } });
     } catch (e) {
       console.error(e);
       alert("Failed to generate estimate. Check your Google Script WebApp URL.");
@@ -184,11 +184,10 @@ export default function EstimateForm() {
               {QUALITY_LEVELS.map((level) => (
                 <label
                   key={level.value}
-                  className={`relative cursor-pointer rounded-xl p-4 border-2 transition-all duration-200 ${
-                    selectedQuality === level.value
-                      ? "border-[#A8E6CF] bg-[#F3FFF7] shadow-md shadow-[#A8E6CF]/20"
-                      : "border-[#E5E7EB] bg-white hover:border-[#A8E6CF]/50 hover:bg-[#F3FFF7]"
-                  }`}
+                  className={`relative cursor-pointer rounded-xl p-4 border-2 transition-all duration-200 ${selectedQuality === level.value
+                    ? "border-[#A8E6CF] bg-[#F3FFF7] shadow-md shadow-[#A8E6CF]/20"
+                    : "border-[#E5E7EB] bg-white hover:border-[#A8E6CF]/50 hover:bg-[#F3FFF7]"
+                    }`}
                 >
                   <input
                     type="radio"

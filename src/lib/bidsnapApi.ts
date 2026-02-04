@@ -1,5 +1,4 @@
-export const BIDSNAP_WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbz_tISOJkSulSDneF_SeCV2XsFstBRHkuaV8jcepFABxBcRFZIWBFylps1pJLnGg3K6Yg/exec";
+export const BIDSNAP_API_BASE = "http://localhost:3001/api";
 
 export type BidSnapInputs = {
   projectType: string;
@@ -9,47 +8,29 @@ export type BidSnapInputs = {
   additionalSpec?: string;
 };
 
-export async function apiGenerateEstimate(inputs: BidSnapInputs) {
+import type { QuoteData } from "../types/estimate";
+
+export async function apiGenerateEstimate(inputs: BidSnapInputs): Promise<QuoteData> {
   try {
-    const res = await fetch(BIDSNAP_WEBAPP_URL, {
+    const res = await fetch(`${BIDSNAP_API_BASE}/estimates/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "estimate",
-        inputs,
+        projectType: inputs.projectType,
+        areaSquareFeet: inputs.areaSqft,
+        qualityLevel: inputs.qualityLevel,
+        location: inputs.location,
+        notes: inputs.additionalSpec,
       }),
     });
 
     const data = await res.json();
-    console.log("API Estimate Response:", data); // DEBUG LOG
+    console.log("API Generate Response:", data);
 
-    if (!data.ok) throw new Error(data.error || "Estimate failed");
-    return data.estimate;
+    if (!res.ok) throw new Error(data.error || "Generation failed");
+    return data as QuoteData;
   } catch (err) {
     console.error("Error in apiGenerateEstimate:", err);
-    throw err;
-  }
-}
-
-export async function apiGenerateProposal(inputs: BidSnapInputs, estimate: any) {
-  try {
-    const res = await fetch(BIDSNAP_WEBAPP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "proposal",
-        inputs,
-        estimate,
-      }),
-    });
-
-    const data = await res.json();
-    console.log("API Proposal Response:", data); // DEBUG LOG
-
-    if (!data.ok) throw new Error(data.error || "Proposal failed");
-    return data.proposal;
-  } catch (err) {
-    console.error("Error in apiGenerateProposal:", err);
     throw err;
   }
 }
