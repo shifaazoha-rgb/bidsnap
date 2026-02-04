@@ -2,32 +2,40 @@
 
 /* BidSnap design tokens - Baby Pink + Pista Green palette */
 @theme {
-  /* Primary (Baby Pink) */
-  --color-primary: #f8bbd0;
-  --color-primary-hover: #f48fb1;
-  --color-primary-text: #4a1d2f;
-
-  /* Accent (Pista Green) */
-  --color-accent: #cdeac0;
-  --color-accent-hover: #a7d7a0;
-  --color-accent-text: #1f3b2c;
+  /* Premium Brand Blues */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #93c5fd;
 
   /* Backgrounds / Surfaces */
-  --color-background: #fff6fa;
-  --color-background-alt: #f3faf5;
-  --color-card: #ffffff;
-  --color-border: #ead7e1;
+  --color-background: #f8faff;
+  --color-surface: #ffffff;
+  --color-surface-soft: #eff6ff;
+  --color-surface-tint: #e0f2fe;
 
-  /* Text */
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #6b7280;
+  /* Text Colors */
+  --color-text-main: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-placeholder: #94a3b8;
 
-  /* Status */
-  --color-success: #7bc47f;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
+  /* Borders + Dividers */
+  --color-border-light: #e2e8f0;
+  --color-border-tint: #dbeafe;
 
-  /* Spacing – spec */
+  /* Status Colors */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Premium Shadows */
+  --shadow-premium-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-premium-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-premium-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-premium-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Spacing */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -35,20 +43,14 @@
   --space-xl: 32px;
   --space-2xl: 48px;
 
-  /* Radius – spec */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 
-  /* Shadows – spec */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-
-  /* Typography – Inter from spec */
+  /* Typography */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -85,18 +87,39 @@ body {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .animate-fadeIn {
@@ -115,8 +138,13 @@ body {
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Custom scrollbar */

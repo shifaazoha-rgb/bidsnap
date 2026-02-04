@@ -29,16 +29,16 @@ function recalcTotals(lineItems: LineItem[]): QuoteTotals {
 }
 
 const CATEGORY_CONFIG = {
-  materials: { color: "#F48FB1", bg: "bg-[#F8BBD0]", text: "text-[#4A1D2F]", icon: "🧱" },
-  labor: { color: "#7BC47F", bg: "bg-[#CDEAC0]", text: "text-[#1F3B2C]", icon: "👷" },
-  equipment: { color: "#6B7280", bg: "bg-[#F3FAF5]", text: "text-[#1F2937]", icon: "🔧" },
-  other: { color: "#6B7280", bg: "bg-[#F3FAF5]", text: "text-[#1F2937]", icon: "📦" },
+  materials: { color: "#3B82F6", bg: "bg-[#EFF6FF]", text: "text-[#1D4ED8]", icon: "🧱" },
+  labor: { color: "#60A5FA", bg: "bg-[#D1E9FF]", text: "text-[#1D4ED8]", icon: "👷" },
+  equipment: { color: "#93C5FD", bg: "bg-[#E0F2FE]", text: "text-[#0F172A]", icon: "🔧" },
+  other: { color: "#94A3B8", bg: "bg-[#F8FAFF]", text: "text-[#0F172A]", icon: "📦" },
 };
 
 const CONFIDENCE_CONFIG = {
-  low: { width: "33%", color: "bg-[#F87171]", label: "Low" },
-  medium: { width: "66%", color: "bg-[#FBBF24]", label: "Medium" },
-  high: { width: "100%", color: "bg-[#7BC47F]", label: "High" },
+  low: { width: "33%", color: "bg-[#EF4444]", label: "Low Accuracy" },
+  medium: { width: "66%", color: "bg-[#F59E0B]", label: "Medium Accuracy" },
+  high: { width: "100%", color: "bg-[#22C55E]", label: "High Precision" },
 };
 
 export default function QuoteDashboard() {
@@ -116,85 +116,80 @@ export default function QuoteDashboard() {
   const confidence = CONFIDENCE_CONFIG[quote.confidence];
 
   return (
-    <div className="min-h-screen bg-[#FFF6FA]">
-      {/* Gradient Header */}
-      <div className="bg-gradient-to-r from-[#F8BBD0] via-[#F48FB1] to-[#F48FB1] text-[#4A1D2F] px-4 py-8 pb-20">
-        <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#F8FAFF] pb-20">
+      {/* Premium Header */}
+      <div className="bg-[#0F172A] relative overflow-hidden text-white pt-12 pb-24 px-4 text-center">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-[#3B82F6]/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#60A5FA]/10 rounded-full blur-[80px]" />
+
+        <div className="max-w-4xl mx-auto relative z-10">
           <Link
             to="/estimate"
             state={{ estimateInput: quote.projectInfo }}
-            className="inline-flex items-center gap-1 text-[#4A1D2F]/80 hover:text-[#4A1D2F] mb-4 text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[#93C5FD] text-xs font-bold uppercase tracking-widest mb-8 backdrop-blur-md hover:bg-white/10 transition-colors"
           >
-            ← Back to Form
+            ← Back to Editor
           </Link>
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-3xl shrink-0">
-              💰
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-1">
-                {quote.projectInfo.projectType}
-              </h1>
-              <p className="text-white/70 text-sm flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1">📐 {quote.projectInfo.areaSquareFeet} sq ft</span>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1 capitalize">✨ {quote.projectInfo.qualityLevel}</span>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1">📍 {quote.projectInfo.location}</span>
-              </p>
-            </div>
-          </div>
+          <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">Project Proposal</h1>
+          <p className="text-white/60 text-lg font-medium">
+            Prepared for: <span className="text-white">{quote.projectInfo.location || "Confidential Project"}</span>
+          </p>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 -mt-12">
+      <div className="max-w-5xl mx-auto px-4 -mt-16 relative z-20">
         {/* Summary Cards */}
         <div className="grid md:grid-cols-3 gap-4 mb-6">
           {/* Total Estimate */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <div className="flex items-center gap-2 text-[#6B7280] text-sm mb-2">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center">💰</span>
+          <div className="bg-white rounded-[2rem] p-8 shadow-premium-xl border border-[#E2E8F0] group hover:border-[#3B82F6] transition-all duration-300">
+            <div className="flex items-center gap-3 text-[#475569] text-xs font-bold uppercase tracking-wider mb-4">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">💰</span>
               Total Estimate
             </div>
-            <p className="text-2xl font-bold text-[#1F2937]">
+            <p className="text-3xl font-black text-[#0F172A] tracking-tight">
               {formatINR(range.min)} – {formatINR(range.max)}
             </p>
           </div>
 
           {/* Timeline */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <div className="flex items-center gap-2 text-[#6B7280] text-sm mb-2">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center">⏱️</span>
+          <div className="bg-white rounded-[2rem] p-8 shadow-premium-xl border border-[#E2E8F0] group hover:border-[#3B82F6] transition-all duration-300">
+            <div className="flex items-center gap-3 text-[#475569] text-xs font-bold uppercase tracking-wider mb-4">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">⏱️</span>
               Timeline
             </div>
-            <p className="text-2xl font-bold text-[#1F2937]">
+            <p className="text-3xl font-black text-[#0F172A] tracking-tight">
               {quote.timeline.min}–{quote.timeline.max} {quote.timeline.unit}
             </p>
           </div>
 
-          {/* Confidence */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <div className="flex items-center gap-2 text-[#6B7280] text-sm mb-2">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center">📈</span>
+          <div className="bg-white rounded-[2rem] p-8 shadow-premium-xl border border-[#E2E8F0] group hover:border-[#3B82F6] transition-all duration-300">
+            <div className="flex items-center gap-3 text-[#475569] text-xs font-bold uppercase tracking-wider mb-4">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">📈</span>
               Confidence
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-3 bg-[#EAD7E1] rounded-full overflow-hidden">
+            <div className="flex flex-col gap-3">
+              <div className="h-3 bg-[#E2E8F0] rounded-full overflow-hidden w-full">
                 <div
-                  className={`h-full ${confidence.color} rounded-full transition-all duration-500`}
+                  className={`h-full ${confidence.color} rounded-full transition-all duration-1000 shadow-sm`}
                   style={{ width: confidence.width }}
                 />
               </div>
-              <span className="text-sm font-semibold text-[#1F2937]">{confidence.label}</span>
+              <span className="text-sm font-bold text-[#0F172A] flex items-center justify-between uppercase">
+                {confidence.label}
+                <span className="text-[#3B82F6]">{confidence.width}</span>
+              </span>
             </div>
           </div>
         </div>
 
         {/* Cost Breakdown - Pie Chart */}
-        <section className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1] mb-6">
-          <h2 className="text-lg font-semibold text-[#1F2937] mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">📊</span>
-            Cost Breakdown
+        <section className="bg-white rounded-[2rem] p-10 shadow-premium-xl border border-[#E2E8F0] mb-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
+            <span className="text-[12rem] select-none">📊</span>
+          </div>
+          <h2 className="text-xl font-black text-[#0F172A] mb-8 flex items-center gap-3 uppercase tracking-tight">
+            <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm">🔍</span>
+            Revenue Distribution
           </h2>
           {chartData.length > 0 ? (
             <div className="flex flex-col md:flex-row items-center gap-6">
@@ -218,41 +213,49 @@ export default function QuoteDashboard() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {totals.materials > 0 && (
-                  <div className="p-4 rounded-xl bg-[#FFF6FA] border border-[#EAD7E1]">
-                    <p className="text-sm text-[#4A1D2F] font-medium mb-1">🧱 Materials</p>
-                    <p className="text-xl font-bold text-[#1F2937]">{formatINR(totals.materials)}</p>
-                    <p className="text-xs text-[#6B7280]">
-                      {totals.total > 0 ? Math.round((totals.materials / totals.total) * 100) : 0}% of total
-                    </p>
+                  <div className="p-6 rounded-[1.5rem] bg-[#F8FAFF] border border-[#DBEAFE] hover:bg-[#EFF6FF] transition-colors group">
+                    <p className="text-xs text-[#3B82F6] font-black uppercase tracking-widest mb-2">🧱 Materials</p>
+                    <div className="flex items-end justify-between">
+                      <p className="text-2xl font-black text-[#0F172A]">{formatINR(totals.materials)}</p>
+                      <p className="text-sm font-bold text-[#475569]">
+                        {totals.total > 0 ? Math.round((totals.materials / totals.total) * 100) : 0}%
+                      </p>
+                    </div>
                   </div>
                 )}
                 {totals.labor > 0 && (
-                  <div className="p-4 rounded-xl bg-[#F3FAF5] border border-[#EAD7E1]">
-                    <p className="text-sm text-[#1F3B2C] font-medium mb-1">👷 Labor</p>
-                    <p className="text-xl font-bold text-[#1F2937]">{formatINR(totals.labor)}</p>
-                    <p className="text-xs text-[#6B7280]">
-                      {totals.total > 0 ? Math.round((totals.labor / totals.total) * 100) : 0}% of total
-                    </p>
+                  <div className="p-6 rounded-[1.5rem] bg-[#F8FAFF] border border-[#DBEAFE] hover:bg-[#EFF6FF] transition-colors group">
+                    <p className="text-xs text-[#60A5FA] font-black uppercase tracking-widest mb-2">👷 Labor</p>
+                    <div className="flex items-end justify-between">
+                      <p className="text-2xl font-black text-[#0F172A]">{formatINR(totals.labor)}</p>
+                      <p className="text-sm font-bold text-[#475569]">
+                        {totals.total > 0 ? Math.round((totals.labor / totals.total) * 100) : 0}%
+                      </p>
+                    </div>
                   </div>
                 )}
                 {totals.equipment > 0 && (
-                  <div className="p-4 rounded-xl bg-white border border-[#EAD7E1]">
-                    <p className="text-sm text-[#1F2937] font-medium mb-1">🔧 Equipment</p>
-                    <p className="text-xl font-bold text-[#1F2937]">{formatINR(totals.equipment)}</p>
-                    <p className="text-xs text-[#6B7280]">
-                      {totals.total > 0 ? Math.round((totals.equipment / totals.total) * 100) : 0}% of total
-                    </p>
+                  <div className="p-6 rounded-[1.5rem] bg-[#F8FAFF] border border-[#DBEAFE] hover:bg-[#EFF6FF] transition-colors group">
+                    <p className="text-xs text-[#93C5FD] font-black uppercase tracking-widest mb-2">🔧 Equipment</p>
+                    <div className="flex items-end justify-between">
+                      <p className="text-2xl font-black text-[#0F172A]">{formatINR(totals.equipment)}</p>
+                      <p className="text-sm font-bold text-[#475569]">
+                        {totals.total > 0 ? Math.round((totals.equipment / totals.total) * 100) : 0}%
+                      </p>
+                    </div>
                   </div>
                 )}
                 {totals.other > 0 && (
-                  <div className="p-4 rounded-xl bg-white border border-[#EAD7E1]">
-                    <p className="text-sm text-[#1F2937] font-medium mb-1">📦 Other</p>
-                    <p className="text-xl font-bold text-[#1F2937]">{formatINR(totals.other)}</p>
-                    <p className="text-xs text-[#6B7280]">
-                      {totals.total > 0 ? Math.round((totals.other / totals.total) * 100) : 0}% of total
-                    </p>
+                  <div className="p-6 rounded-[1.5rem] bg-[#F8FAFF] border border-[#DBEAFE] hover:bg-[#EFF6FF] transition-colors group">
+                    <p className="text-xs text-[#94A3B8] font-black uppercase tracking-widest mb-2">📦 Other</p>
+                    <div className="flex items-end justify-between">
+                      <p className="text-2xl font-black text-[#0F172A]">{formatINR(totals.other)}</p>
+                      <p className="text-sm font-bold text-[#475569]">
+                        {totals.total > 0 ? Math.round((totals.other / totals.total) * 100) : 0}%
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -263,18 +266,18 @@ export default function QuoteDashboard() {
         </section>
 
         {/* Line Items Table */}
-        <section className="bg-white rounded-2xl shadow-lg border border-[#EAD7E1] mb-6 overflow-hidden">
-          <div className="p-4 border-b border-[#EAD7E1] flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-[#1F2937] flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">📋</span>
-              Line Items
+        <section className="bg-white rounded-[2rem] shadow-premium-xl border border-[#E2E8F0] mb-8 overflow-hidden">
+          <div className="p-8 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFF]">
+            <h2 className="text-xl font-black text-[#0F172A] flex items-center gap-3 uppercase tracking-tight">
+              <span className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-center text-xl shadow-sm">📋</span>
+              Inventory Breakdown
             </h2>
-            <span className="text-sm text-[#6B7280]">{quote.lineItems.length} items</span>
+            <span className="px-4 py-1 rounded-full bg-[#3B82F6]/10 text-[#3B82F6] text-xs font-black uppercase tracking-widest">{quote.lineItems.length} items</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#F3FAF5] border-b border-[#EAD7E1]">
+                <tr className="bg-[#F1F6FF] border-b border-[#E2E8F0]">
                   <th className="p-4 text-left font-semibold text-[#1F2937]">Item</th>
                   <th className="p-4 text-left font-semibold text-[#1F2937]">Category</th>
                   <th className="p-4 text-left font-semibold text-[#1F2937]">Qty</th>
@@ -287,10 +290,10 @@ export default function QuoteDashboard() {
                 {quote.lineItems.map((item) => {
                   const cat = CATEGORY_CONFIG[item.category] ?? CATEGORY_CONFIG.other;
                   return (
-                    <tr key={item.id} className="border-b border-[#EAD7E1]/70 hover:bg-[#FFF6FA] transition-colors">
+                    <tr key={item.id} className="border-b border-[#E2E8F0]/70 hover:bg-[#F8FAFF] transition-colors">
                       <td className="p-4">
-                        <p className="font-medium text-[#1F2937]">{item.item}</p>
-                        {item.notes && <p className="text-xs text-[#6B7280] mt-0.5">{item.notes}</p>}
+                        <p className="font-medium text-[#0F172A]">{item.item}</p>
+                        {item.notes && <p className="text-xs text-[#64748B] mt-0.5">{item.notes}</p>}
                       </td>
                       <td className="p-4">
                         <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${cat.bg} ${cat.text}`}>
@@ -307,10 +310,10 @@ export default function QuoteDashboard() {
                             onChange={(e) =>
                               handleQuantityOrUnitCostChange(item.id, "quantity", Number(e.target.value) || 0)
                             }
-                            className="w-20 px-2 py-1.5 rounded-lg border-2 border-[#EAD7E1] focus:border-[#F48FB1] outline-none bg-[#FFF6FA]"
+                            className="w-20 px-2 py-1.5 rounded-lg border-2 border-[#E2E8F0] focus:border-[#2563EB] outline-none bg-[#F8FAFF]"
                           />
                         ) : (
-                          <span className="text-[#1F2937]">{item.quantity} {item.unit}</span>
+                          <span className="text-[#0F172A]">{item.quantity} {item.unit}</span>
                         )}
                       </td>
                       <td className="p-4">
@@ -323,23 +326,22 @@ export default function QuoteDashboard() {
                             onChange={(e) =>
                               handleQuantityOrUnitCostChange(item.id, "unitCost", Number(e.target.value) || 0)
                             }
-                            className="w-24 px-2 py-1.5 rounded-lg border-2 border-[#EAD7E1] focus:border-[#F48FB1] outline-none bg-[#FFF6FA]"
+                            className="w-24 px-2 py-1.5 rounded-lg border-2 border-[#E2E8F0] focus:border-[#2563EB] outline-none bg-[#F8FAFF]"
                           />
                         ) : (
-                          <span className="text-[#1F2937]">{formatINR(item.unitCost)}</span>
+                          <span className="text-[#0F172A]">{formatINR(item.unitCost)}</span>
                         )}
                       </td>
-                      <td className="p-4 font-semibold text-[#1F2937]">{formatINR(item.quantity * item.unitCost)}</td>
+                      <td className="p-4 font-semibold text-[#0F172A]">{formatINR(item.quantity * item.unitCost)}</td>
                       <td className="p-4">
                         <div className="flex gap-1">
                           <button
                             type="button"
                             onClick={() => setEditingId(editingId === item.id ? null : item.id)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              editingId === item.id
-                                ? "bg-[#F8BBD0] text-[#4A1D2F] hover:bg-[#F48FB1]"
-                                : "bg-[#F3FAF5] text-[#6B7280] hover:bg-[#F8BBD0] hover:text-[#4A1D2F]"
-                            }`}
+                            className={`p-2 rounded-lg transition-colors ${editingId === item.id
+                              ? "bg-[#A8E6CF] text-[#1F3B2C] hover:bg-[#7FD8B5]"
+                              : "bg-[#F3FFF7] text-[#6B7280] hover:bg-[#A8E6CF] hover:text-[#1F3B2C]"
+                              }`}
                             title={editingId === item.id ? "Save" : "Edit"}
                           >
                             {editingId === item.id ? "✓" : "✏️"}
@@ -361,61 +363,64 @@ export default function QuoteDashboard() {
             </table>
           </div>
           {!showAddRow ? (
-            <div className="p-4 border-t border-[#EAD7E1]">
+            <div className="p-4 border-t border-[#E2E8F0]">
               <button
                 type="button"
                 onClick={() => setShowAddRow(true)}
-                className="inline-flex items-center gap-2 text-[#4A1D2F] hover:text-[#4A1D2F] font-medium text-sm transition-colors"
+                className="inline-flex items-center gap-2 text-[#2563EB] hover:text-[#1E40AF] font-medium text-sm transition-colors"
               >
-                <span className="w-6 h-6 rounded-full bg-[#F8BBD0] text-[#4A1D2F] flex items-center justify-center border border-[#EAD7E1]">+</span>
+                <span className="w-6 h-6 rounded-full bg-[#2563EB] text-white flex items-center justify-center border border-[#DBEAFE]">+</span>
                 Add custom line item
               </button>
             </div>
           ) : (
             <AddLineItemRow onAdd={addLineItem} onCancel={() => setShowAddRow(false)} />
           )}
-          <div className="p-4 border-t border-[#EAD7E1] bg-gradient-to-r from-[#FFF6FA] to-white flex items-center justify-between">
-            <span className="text-[#6B7280] font-medium">Grand Total</span>
-            <span className="text-2xl font-bold text-[#4A1D2F]">{formatINR(totals.total)}</span>
+          <div className="p-4 border-t border-[#E2E8F0] bg-gradient-to-r from-[#F8FAFF] to-white flex items-center justify-between">
+            <span className="text-[#64748B] font-medium">Grand Total</span>
+            <span className="text-2xl font-bold text-[#0F172A]">{formatINR(totals.total)}</span>
           </div>
         </section>
 
         {/* Assumptions */}
-        <section className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1] mb-6">
-          <h2 className="text-lg font-semibold text-[#1F2937] mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">📝</span>
-            Assumptions & Notes
+        <section className="bg-white rounded-[2rem] p-10 shadow-premium-xl border border-[#E2E8F0] mb-8 relative overflow-hidden">
+          <div className="absolute top-0 left-0 p-4 opacity-[0.03]">
+            <span className="text-[12rem] select-none">📝</span>
+          </div>
+          <h2 className="text-xl font-black text-[#0F172A] mb-8 flex items-center gap-3 uppercase tracking-tight relative z-10">
+            <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm">📑</span>
+            Project Terms
           </h2>
-          <ul className="space-y-2">
+          <ul className="space-y-4 relative z-10">
             {quote.assumptions.map((a, i) => (
-              <li key={i} className="flex items-start gap-2 text-[#1F2937]">
-                <span className="text-[#7BC47F] mt-0.5">✓</span>
+              <li key={i} className="flex items-start gap-3 text-[#475569] font-medium leading-relaxed">
+                <span className="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] text-xs font-bold mt-0.5 shrink-0">✓</span>
                 {a}
               </li>
             ))}
           </ul>
         </section>
 
-        {/* Actions */}
-        <section className="flex flex-wrap gap-3 pb-8">
+        {/* Floating Actions */}
+        <section className="flex flex-wrap items-center justify-center gap-4 pb-12">
           <Link
             to="/estimate"
             state={{ estimateInput: quote.projectInfo }}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-[#1F2937] bg-white border-2 border-[#EAD7E1] hover:border-[#F48FB1] hover:bg-[#FFF6FA] transition-all"
+            className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-black text-[#0F172A] bg-white border-2 border-[#E2E8F0] hover:border-[#3B82F6] hover:bg-[#F8FAFF] transition-all shadow-premium-lg hover:-translate-y-1"
           >
-            ✏️ Edit Estimate
+            ✏️ Modify Estimate
           </Link>
           <button
             type="button"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-[#4A1D2F] bg-[#F8BBD0] hover:bg-[#F48FB1] transition-all shadow-lg shadow-[#F48FB1]/20 hover:shadow-xl border border-[#EAD7E1]"
+            className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-black text-white bg-[#3B82F6] hover:bg-[#1D4ED8] transition-all shadow-[0_20px_40px_rgba(59,130,246,0.3)] hover:shadow-[0_20px_40px_rgba(29,78,216,0.4)] hover:-translate-y-1"
           >
-            📄 Download PDF
+            📄 Finalize & Export
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-[#1F2937] bg-white border-2 border-[#EAD7E1] hover:border-[#A7D7A0] hover:bg-[#F3FAF5] transition-all"
+            className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-black text-[#475569] bg-slate-100 border border-[#E2E8F0] hover:bg-slate-200 transition-all shadow-premium-md"
           >
-            🔗 Share Link
+            🔗 Copy Secure Link
           </button>
         </section>
       </div>
@@ -452,19 +457,19 @@ function AddLineItemRow({
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 border-t border-[#EAD7E1] bg-[#FFF6FA] grid gap-3 md:grid-cols-7 md:items-end"
+      className="p-4 border-t border-[#E2E8F0] bg-[#F8FAFF] grid gap-3 md:grid-cols-7 md:items-end"
     >
       <input
         type="text"
         placeholder="Item name"
         value={item}
         onChange={(e) => setItem(e.target.value)}
-        className="px-3 py-2.5 rounded-lg border-2 border-[#EAD7E1] focus:border-[#F48FB1] outline-none md:col-span-2 bg-white"
+        className="px-3 py-2.5 rounded-lg border-2 border-[#E2E8F0] focus:border-[#2563EB] outline-none md:col-span-2 bg-white"
       />
       <select
         value={category}
         onChange={(e) => setCategory(e.target.value as LineItem["category"])}
-        className="px-3 py-2.5 rounded-lg border-2 border-[#EAD7E1] focus:border-[#F48FB1] outline-none bg-white"
+        className="px-3 py-2.5 rounded-lg border-2 border-[#E2E8F0] focus:border-[#2563EB] outline-none bg-white"
       >
         <option value="materials">🧱 Materials</option>
         <option value="labor">👷 Labor</option>
@@ -478,14 +483,14 @@ function AddLineItemRow({
         placeholder="Qty"
         value={quantity || ""}
         onChange={(e) => setQuantity(Number(e.target.value) || 0)}
-        className="px-3 py-2.5 rounded-lg border-2 border-[#EAD7E1] focus:border-[#F48FB1] outline-none bg-white"
+        className="px-3 py-2.5 rounded-lg border-2 border-[#E2E8F0] focus:border-[#2563EB] outline-none bg-white"
       />
       <input
         type="text"
         placeholder="Unit"
         value={unit}
         onChange={(e) => setUnit(e.target.value)}
-        className="px-3 py-2.5 rounded-lg border-2 border-[#EAD7E1] focus:border-[#F48FB1] outline-none bg-white"
+        className="px-3 py-2.5 rounded-lg border-2 border-[#E2E8F0] focus:border-[#2563EB] outline-none bg-white"
       />
       <input
         type="number"
@@ -494,19 +499,19 @@ function AddLineItemRow({
         placeholder="₹ Cost"
         value={unitCost || ""}
         onChange={(e) => setUnitCost(Number(e.target.value) || 0)}
-        className="px-3 py-2.5 rounded-lg border-2 border-[#EAD7E1] focus:border-[#F48FB1] outline-none bg-white"
+        className="px-3 py-2.5 rounded-lg border-2 border-[#E2E8F0] focus:border-[#2563EB] outline-none bg-white"
       />
       <div className="flex gap-2">
         <button
           type="submit"
-          className="px-4 py-2.5 rounded-lg font-medium text-[#4A1D2F] bg-[#F8BBD0] hover:bg-[#F48FB1] transition-colors border border-[#EAD7E1]"
+          className="px-4 py-2.5 rounded-lg font-medium text-white bg-[#2563EB] hover:bg-[#1E40AF] transition-colors border border-[#DBEAFE]"
         >
           Add
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2.5 rounded-lg font-medium text-[#6B7280] bg-white border-2 border-[#EAD7E1] hover:bg-[#FFF6FA] transition-colors"
+          className="px-4 py-2.5 rounded-lg font-medium text-[#64748B] bg-white border-2 border-[#E2E8F0] hover:bg-[#F8FAFF] transition-colors"
         >
           Cancel
         </button>

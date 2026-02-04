@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import type { EstimateInput, QuoteData } from "../types/estimate";
-
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import type { EstimateInput } from "../types/estimate";
+// Runtime imports
+import { apiGenerateEstimate, apiGenerateProposal } from "../lib/bidsnapApi";
+// Type-only import
+import type { BidSnapInputs } from "../lib/bidsnapApi";
 
 const PROJECT_TYPES = [
   { value: "Painting", icon: "🎨", label: "Painting" },
@@ -28,7 +30,7 @@ const QUALITY_LEVELS = [
     label: "Standard",
     icon: "⭐⭐",
     description: "Quality & value balanced",
-    color: "from-[#CDEAC0] to-[#A7D7A0]",
+    color: "from-[#60A5FA] to-[#2563EB]",
   },
   {
     value: "premium",
@@ -39,8 +41,6 @@ const QUALITY_LEVELS = [
   },
 ] as const;
 
-type FormData = EstimateInput;
-
 export default function EstimateForm() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +50,7 @@ export default function EstimateForm() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<EstimateInput>({
     defaultValues: {
       projectType: "",
       areaSquareFeet: undefined,
@@ -62,36 +62,39 @@ export default function EstimateForm() {
 
   const selectedQuality = watch("qualityLevel");
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: EstimateInput) => {
     setIsSubmitting(true);
+
     try {
-      const res = await fetch(`${API_BASE}/api/estimates/generate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error ?? "Failed to generate estimate");
-      }
-      const quote: QuoteData = await res.json();
-      navigate(`/quote/${quote.id}`, { state: { quote } });
+      const inputs: BidSnapInputs = {
+        projectType: data.projectType,
+        areaSqft: Number(data.areaSquareFeet),
+        location: data.location,
+        qualityLevel: data.qualityLevel,
+        additionalSpec: data.notes || "",
+      };
+
+      const estimate = await apiGenerateEstimate(inputs);
+      const proposal = await apiGenerateProposal(inputs, estimate);
+
+      navigate("/quotedashboard", { state: { estimate, inputs } });
     } catch (e) {
       console.error(e);
-      navigate("/quote/mock-1", { state: { estimateInput: data } });
+      alert("Failed to generate estimate. Check your Google Script WebApp URL.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF6FA]">
+    <div className="min-h-screen bg-[#F8FAFF]">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#F8BBD0] via-[#F48FB1] to-[#F48FB1] text-[#4A1D2F] px-4 py-8">
+      <div className="bg-[#0F172A] relative overflow-hidden text-white px-4 py-12">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#3B82F6]/10 rounded-full blur-[80px]" />
         <div className="max-w-2xl mx-auto">
           <Link
             to="/"
-            className="inline-flex items-center gap-1 text-[#4A1D2F]/80 hover:text-[#4A1D2F] mb-4 text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-1 text-white/80 hover:text-white mb-4 text-sm font-medium transition-colors"
           >
             ← Back to Home
           </Link>
@@ -100,9 +103,9 @@ export default function EstimateForm() {
               💰
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">New Estimate</h1>
-              <p className="text-[#4A1D2F]/70 text-sm">
-                Fill in project details for an instant AI quote
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-2">New Estimate</h1>
+              <p className="text-white/60 text-base font-medium">
+                Generate an accurate, professional quote in seconds.
               </p>
             </div>
           </div>
@@ -113,14 +116,14 @@ export default function EstimateForm() {
       <div className="max-w-2xl mx-auto px-4 py-8 -mt-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Project Type */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#1F2937] mb-4">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">🏗️</span>
-              Project Type <span className="text-red-500">*</span>
+          <div className="bg-white rounded-3xl p-8 shadow-premium-lg border border-[#E2E8F0]">
+            <label className="flex items-center gap-3 text-sm font-bold text-[#0F172A] mb-5 uppercase tracking-wider">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm">🏗️</span>
+              Project Type <span className="text-[#3B82F6]">*</span>
             </label>
             <select
               {...register("projectType", { required: "Select a project type" })}
-              className="w-full px-4 py-3.5 rounded-xl border-2 border-[#EAD7E1] bg-[#FFF6FA] text-[#1F2937] focus:outline-none focus:border-[#F48FB1] focus:bg-white transition-all text-base"
+              className="w-full px-4 py-3.5 rounded-xl border-2 border-[#E2E8F0] bg-[#F8FAFF] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all text-base"
               aria-invalid={!!errors.projectType}
             >
               <option value="">Choose project type...</option>
@@ -138,10 +141,10 @@ export default function EstimateForm() {
           </div>
 
           {/* Area */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#1F2937] mb-4">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">📐</span>
-              Area <span className="text-red-500">*</span>
+          <div className="bg-white rounded-3xl p-8 shadow-premium-lg border border-[#E2E8F0]">
+            <label className="flex items-center gap-3 text-sm font-bold text-[#0F172A] mb-5 uppercase tracking-wider">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm">📐</span>
+              Area <span className="text-[#3B82F6]">*</span>
             </label>
             <div className="relative">
               <input
@@ -157,10 +160,10 @@ export default function EstimateForm() {
                       ? true
                       : "Enter 1–100,000 sq ft",
                 })}
-                className="w-full px-4 py-3.5 pr-16 rounded-xl border-2 border-[#EAD7E1] bg-[#FFF6FA] text-[#1F2937] focus:outline-none focus:border-[#F48FB1] focus:bg-white transition-all text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-full px-4 py-3.5 pr-16 rounded-xl border-2 border-[#E2E8F0] bg-[#F8FAFF] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 aria-invalid={!!errors.areaSquareFeet}
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B7280] font-medium bg-[#F3FAF5] px-2 py-1 rounded-lg text-sm border border-[#EAD7E1]">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] font-medium bg-[#F1F6FF] px-2 py-1 rounded-lg text-sm border border-[#DBEAFE]">
                 sq ft
               </span>
             </div>
@@ -171,11 +174,11 @@ export default function EstimateForm() {
             )}
           </div>
 
-          {/* Quality Level - Cards */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#1F2937] mb-4">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">✨</span>
-              Quality Level <span className="text-red-500">*</span>
+          {/* Quality Level */}
+          <div className="bg-white rounded-3xl p-8 shadow-premium-lg border border-[#E2E8F0]">
+            <label className="flex items-center gap-3 text-sm font-bold text-[#0F172A] mb-5 uppercase tracking-wider">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm">✨</span>
+              Quality Level <span className="text-[#3B82F6]">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {QUALITY_LEVELS.map((level) => (
@@ -183,26 +186,26 @@ export default function EstimateForm() {
                   key={level.value}
                   className={`relative cursor-pointer rounded-xl p-4 border-2 transition-all duration-200 ${
                     selectedQuality === level.value
-                      ? "border-[#F48FB1] bg-[#FFF6FA] shadow-md shadow-[#F48FB1]/20"
-                      : "border-[#EAD7E1] bg-white hover:border-[#F48FB1]/50 hover:bg-[#FFF6FA]"
+                      ? "border-[#A8E6CF] bg-[#F3FFF7] shadow-md shadow-[#A8E6CF]/20"
+                      : "border-[#E5E7EB] bg-white hover:border-[#A8E6CF]/50 hover:bg-[#F3FFF7]"
                   }`}
                 >
                   <input
                     type="radio"
                     value={level.value}
-                    {...register("qualityLevel", {
-                      required: "Select a quality level",
-                    })}
+                    {...register("qualityLevel", { required: "Select a quality level" })}
                     className="sr-only"
                   />
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${level.color} flex items-center justify-center text-white text-sm font-bold mb-2`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg bg-gradient-to-br ${level.color} flex items-center justify-center text-white text-sm font-bold mb-2`}
+                  >
                     {level.value === "basic" ? "B" : level.value === "standard" ? "S" : "P"}
                   </div>
                   <p className="font-semibold text-[#1F2937] text-sm">{level.label}</p>
                   <p className="text-xs text-[#6B7280] mt-0.5">{level.description}</p>
                   {selectedQuality === level.value && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-[#F48FB1] rounded-full flex items-center justify-center">
-                      <span className="text-[#4A1D2F] text-xs">✓</span>
+                    <div className="absolute top-3 right-3 w-6 h-6 bg-[#3B82F6] rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-white text-xs font-bold">✓</span>
                     </div>
                   )}
                 </label>
@@ -216,22 +219,19 @@ export default function EstimateForm() {
           </div>
 
           {/* Location */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#1F2937] mb-4">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">📍</span>
-              Location <span className="text-red-500">*</span>
+          <div className="bg-white rounded-3xl p-8 shadow-premium-lg border border-[#E2E8F0]">
+            <label className="flex items-center gap-3 text-sm font-bold text-[#0F172A] mb-5 uppercase tracking-wider">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm">📍</span>
+              Location <span className="text-[#3B82F6]">*</span>
             </label>
             <input
               type="text"
               placeholder="City or PIN code"
               {...register("location", {
                 required: "Enter city or PIN code",
-                minLength: {
-                  value: 3,
-                  message: "At least 3 characters",
-                },
+                minLength: { value: 3, message: "At least 3 characters" },
               })}
-              className="w-full px-4 py-3.5 rounded-xl border-2 border-[#EAD7E1] bg-[#FFF6FA] text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F48FB1] focus:bg-white transition-all text-base"
+              className="w-full px-4 py-3.5 rounded-xl border-2 border-[#E2E8F0] bg-[#F8FAFF] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all text-base"
               aria-invalid={!!errors.location}
             />
             {errors.location && (
@@ -242,21 +242,16 @@ export default function EstimateForm() {
           </div>
 
           {/* Additional Notes */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-[#EAD7E1]">
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#1F2937] mb-4">
-              <span className="w-8 h-8 rounded-lg bg-[#F3FAF5] border border-[#EAD7E1] flex items-center justify-center text-lg">📝</span>
-              Additional Notes <span className="text-[#6B7280] font-normal">(optional)</span>
+          <div className="bg-white rounded-3xl p-8 shadow-premium-lg border border-[#E2E8F0]">
+            <label className="flex items-center gap-3 text-sm font-bold text-[#0F172A] mb-5 uppercase tracking-wider">
+              <span className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center text-xl shadow-sm">📝</span>
+              Additional Notes <span className="text-[#94A3B8] font-normal lowercase">(optional)</span>
             </label>
             <textarea
               rows={3}
               placeholder="Any specific requirements, materials, or details..."
-              {...register("notes", {
-                maxLength: {
-                  value: 500,
-                  message: "Max 500 characters",
-                },
-              })}
-              className="w-full px-4 py-3.5 rounded-xl border-2 border-[#EAD7E1] bg-[#FFF6FA] text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:border-[#F48FB1] focus:bg-white transition-all text-base resize-none"
+              {...register("notes", { maxLength: { value: 500, message: "Max 500 characters" } })}
+              className="w-full px-4 py-3.5 rounded-xl border-2 border-[#E2E8F0] bg-[#F8FAFF] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all text-base resize-none"
               aria-invalid={!!errors.notes}
             />
             {errors.notes && (
@@ -270,7 +265,7 @@ export default function EstimateForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-xl font-semibold text-[#4A1D2F] text-lg bg-[#F8BBD0] hover:bg-[#F48FB1] disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-[#F48FB1]/20 hover:shadow-xl hover:shadow-[#F48FB1]/25 flex items-center justify-center gap-3 border border-[#EAD7E1]"
+            className="group w-full py-5 rounded-2xl font-black text-white text-xl bg-[#3B82F6] hover:bg-[#1D4ED8] disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-300 shadow-[0_20px_40px_rgba(59,130,246,0.3)] hover:shadow-[0_20px_40px_rgba(29,78,216,0.4)] flex items-center justify-center gap-4 border border-[#DBEAFE] hover:-translate-y-1"
           >
             {isSubmitting ? (
               <>
